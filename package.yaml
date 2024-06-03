@@ -1,5 +1,5 @@
 name:                fuddle
-version:             0.1.0.0
+version:             0.19.1.0
 github:              "whatsupfudd/fuddle-lang"
 license:             BSD3
 author:              "Hugo DesRosiers"
@@ -37,12 +37,45 @@ dependencies:
   - optparse-applicative
   # For Cont(T):
   - mtl
-
+  # For elm-wasm:
+  - ansi-wl-pprint
+  - ansi-terminal >= 0.8
+  - binary
+  - containers
+  - edit-distance
+  - file-embed
+  - filelock
+  - fsnotify
+  - ghc-prim
+  - haskeline
+  - HTTP
+  - http-client
+  - http-client-tls
+  - http-types
+  - language-glsl
+  - mtl
+  - network
+  - parsec
+  - process
+  - raw-strings-qq
+  - scientific
+  - SHA
+  - snap-core
+  - snap-server
+  - template-haskell
+  - time
+  - unordered-containers
+  - utf8-string
+  - websockets
+  - word8
+  - zip-archive
 
 default-extensions:
-- OverloadedStrings
-- DuplicateRecordFields
-- OverloadedRecordDot
+  - OverloadedStrings
+  - DuplicateRecordFields
+  - OverloadedRecordDot
+  # For ElmWasm?
+  - TemplateHaskell
 
 ghc-options:
 # - -Wall
@@ -57,7 +90,13 @@ ghc-options:
 - -Wredundant-constraints
 
 library:
-  source-dirs: src
+  source-dirs:
+    - src
+    - elm-wasm/compiler/src
+    - elm-wasm/terminal/src
+    - elm-wasm/terminal/impl
+    - elm-wasm/builder/src
+    - elm-wasm/reactor/src
 
 executables:
   fuddle:

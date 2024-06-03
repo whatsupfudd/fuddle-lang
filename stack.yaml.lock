@@ -3,7 +3,14 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: snap-server-1.1.2.1@sha256:1472326ecc890c3af6cb88355d4fbfa2e64c6dce4c5a9c36b80af4ca8e36dc1a,15471
+    pantry-tree:
+      sha256: 115460d6a6c93f2cc239fa065e563374718174aefbe411754a27e56ba4aff4cf
+      size: 3313
+  original:
+    hackage: snap-server-1.1.2.1
 snapshots:
 - completed:
     sha256: a81fb3877c4f9031e1325eb3935122e608d80715dc16b586eb11ddbff8671ecd

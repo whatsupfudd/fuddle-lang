@@ -1,0 +1,126 @@
+module Config.GlobalConfig where
+
+import qualified System.Exit as SEx
+import qualified System.Environment as SE
+import qualified System.Console.GetOpt as CGo
+import qualified Data.ConfigFile as CF
+import qualified System.Directory as SDir
+
+
+internalDefaultFuddHome :: FilePath
+internalDefaultFuddHome = ".fudd"
+
+internalDefaultElmHome :: FilePath
+internalDefaultElmHome = ".elm"
+
+internalDefaultConfFilePath :: FilePath
+dinternalDefaultConfFilePath = "platform.conf"
+
+
+data CmdLineArg =
+    ConfigFile String           -- c/conf
+    | DirPath FilePath            -- p/path
+    | Version                   -- v/version
+    | Help                      -- h/help
+    deriving (Eq,Ord,Show)
+
+
+cmdLineOptions :: [CGo.OptDescr CmdLineArg]
+cmdLineOptions = [
+     CGo.Option ['c'] ["conffile"] (CGo.ReqArg parseConfigFile "FILE") "Platform configuration file."
+     , CGo.Option ['p'] ["projpath"] (CGo.ReqArg parseProjPath "PATH") "Project entry-level path."
+     , CGo.Option ['P'] ["pkgsrv"] (CGo.ReqArg parsePkgServer "PGKSRV") "Package server URL."
+     , CGo.Option ['t'] ["pkgtaxo"] (CGo.ReqArg parsePkgTaxonomy "PKGTAXO") "Package taxonomy."
+     , CGo.Option ['w'] ["warnings"] (CGo.ReqArg parseWarning "WARNINGS") "Warning mode."
+     , CGo.Option ['h'] ["help"] (CGo.NoArg Help) "Provide help go get things done!"
+     , CGo.Option ['v'] ["version"] (CGo.NoArg Help) "Introspection on the executable."
+  ]
+
+execName = "fudd"
+cmdLineOptions = "[-c/--conf <config file>] [-p/--path <path>] | [-h/--help] | [-v/--verbose]"
+
+
+parseConfig :: String -> CmdLineArg
+parseConfig mbString =
+   ConfigFile mbString
+
+parsePath :: String -> CmdLineArg
+parsePath mbString =
+   DirPath mbString
+
+parseJob :: String -> CmdLineArg
+parseJob mbString =
+    JobToDo mbString
+
+
+
+parseArgs :: [String] -> IO ([CmdLineArg], [String])
+parseArgs argv= case CGo.getOpt CGo.Permute cmdLineOptions argv of
+    (args,fs,[]) -> do
+        -- let files = if null fs then ["-"] else fs
+        let files = fs
+        if Help `elem` args
+            then do SIo.hPutStrLn SIo.stderr (CGo.usageInfo header cmdLineOptions)
+                    SEx.exitWith SEx.ExitSuccess
+            else return (DL.nub (concatMap (\x -> [ x ]) args), files)
+
+    (_,_,errs)      -> do
+        SIo.hPutStrLn SIo.stderr (concat errs ++ CGo.usageInfo header cmdLineOptions)
+        SEx.exitWith (SEx.ExitFailure 1)
+
+    where header = "Usage: " ++ execName ++ topArgs
+
+
+showDbgArguments :: [ CmdLineArg ] -> IO ()
+showDbgArguments args = do
+  showDbgArguments' args
+
+showDbgArguments' :: [CmdLineArg] -> IO ()
+showDbgArguments' [] = return ()
+showDbgArguments' (car:cons) = showDbgArg car >> showDbgArguments' cons
+
+
+showDbgArg :: CmdLineArg -> IO ()
+showDbgArg anArg = do
+  putStrLn dbgMsg where
+    dbgMsg = case anArg of
+      ConfigFile aFile -> "Conf: " ++ aFile
+      DirPath aPath -> "Path: " ++ aPath
+      JobToDo aCmd -> "Job: " ++ aCmd
+      Help -> "help!"
+
+
+loadGlobConfig :: [ CmdLineArg ] -> IO Parameters
+loadGlobConfig cmdArgs = do
+  targetPath <- findDirPath cmdArgs
+  let configs = Params { pkgServer = defaultPkgServer, pkgServerPort = 8000, path= targetPath }
+  targetFile <- findTargetFile cmdArgs
+  val <- CF.readfile CF.emptyCP targetFile
+  case val of
+      Right configValues -> do
+        o1 <- return $ setStringFromConfFile "pkgsrv" (\v c -> c { pkgServer = v }) configValues configs
+        o2 <- return $ setStringFromConfFile "pkgsrvport" (\v c -> c { pkgServerPrt = v }) configValues o1
+        o3 <- return $ setStringFromConfFile "user" (\v c -> c { user = v }) configValues o2
+        o4 <- return $ setStringFromConfFile "pswd" (\v c -> c { pswd = v }) configValues o3
+        return o4
+      Left (_, msg) -> do
+        putStrLn $ "Error on config file: " ++ msg
+        return configs
+
+
+setStringFromConfFile :: String -> (String -> Parameters -> Parameters) -> CF.ConfigParser -> Parameters -> Parameters
+setStringFromConfFile confName accessor fileValues configs =
+  case CF.get fileValues "default" confName of
+     Right value -> accessor value configs
+     Left _ ->  configs
+
+
+findDirPath :: [ CmdLineArg ] -> IO FilePath
+findDirPath cmdArgs =
+  case filter dirPathP cmdArgs of
+          (DirPath aPath):_ -> return aPath
+          _ -> SDir.getCurrentDirectory >>= (\path -> path)
+    where dirPathP x = case x of
+             DirPath _ -> True
+             _ -> False
+

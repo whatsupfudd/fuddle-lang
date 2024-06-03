@@ -5,7 +5,7 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           fuddle
-version:        0.1.0.0
+version:        0.19.1.0
 description:    Please see the README on GitHub at <https://github.com/whatsupfudd/fuddle-lang#readme>
 homepage:       https://github.com/whatsupfudd/fuddle-lang#readme
 bug-reports:    https://github.com/whatsupfudd/fuddle-lang/issues
@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Commands
+      Commands.Compile
       Commands.Help
       Commands.Version
       DB.Connect
@@ -35,28 +36,203 @@ library
       Options.Cli
       Options.ConfFile
       Options.Runtime
+      AST.Canonical
+      AST.Optimized
+      AST.Source
+      AST.Utils.Binop
+      AST.Utils.Shader
+      AST.Utils.Type
+      Canonicalize.Effects
+      Canonicalize.Environment
+      Canonicalize.Environment.Dups
+      Canonicalize.Environment.Foreign
+      Canonicalize.Environment.Local
+      Canonicalize.Expression
+      Canonicalize.Module
+      Canonicalize.Pattern
+      Canonicalize.Type
+      Compile
+      Data.Bag
+      Data.Index
+      Data.Map.Utils
+      Data.Name
+      Data.NonEmptyList
+      Data.OneOrMore
+      Data.Utf8
+      Elm.Compiler.Imports
+      Elm.Compiler.Type
+      Elm.Compiler.Type.Extract
+      Elm.Constraint
+      Elm.Docs
+      Elm.Float
+      Elm.Interface
+      Elm.Kernel
+      Elm.Licenses
+      Elm.Magnitude
+      Elm.ModuleName
+      Elm.Package
+      Elm.String
+      Elm.Version
+      Generate.C
+      Generate.C.AST
+      Generate.C.Builder
+      Generate.C.Expression
+      Generate.C.JsWrappers
+      Generate.C.Kernel
+      Generate.C.Name
+      Generate.Html
+      Generate.JavaScript
+      Generate.JavaScript.Builder
+      Generate.JavaScript.Expression
+      Generate.JavaScript.Functions
+      Generate.JavaScript.Name
+      Generate.Mode
+      Json.Decode
+      Json.Encode
+      Json.String
+      Nitpick.Debug
+      Nitpick.PatternMatches
+      Optimize.Case
+      Optimize.DecisionTree
+      Optimize.Expression
+      Optimize.Module
+      Optimize.Names
+      Optimize.Port
+      Parse.Declaration
+      Parse.Expression
+      Parse.Keyword
+      Parse.Module
+      Parse.Number
+      Parse.Pattern
+      Parse.Primitives
+      Parse.Shader
+      Parse.Space
+      Parse.String
+      Parse.Symbol
+      Parse.Type
+      Parse.Variable
+      Reporting.Annotation
+      Reporting.Doc
+      Reporting.Error
+      Reporting.Error.Canonicalize
+      Reporting.Error.Docs
+      Reporting.Error.Import
+      Reporting.Error.Json
+      Reporting.Error.Main
+      Reporting.Error.Pattern
+      Reporting.Error.Syntax
+      Reporting.Error.Type
+      Reporting.Render.Code
+      Reporting.Render.Type
+      Reporting.Render.Type.Localizer
+      Reporting.Report
+      Reporting.Result
+      Reporting.Suggest
+      Reporting.Warning
+      Type.Constrain.Expression
+      Type.Constrain.Module
+      Type.Constrain.Pattern
+      Type.Error
+      Type.Instantiate
+      Type.Occurs
+      Type.Solve
+      Type.Type
+      Type.Unify
+      Type.UnionFind
+      ApiGen
+      Bump
+      Develop
+      Develop.Generate.Help
+      Develop.Generate.Index
+      Develop.Socket
+      Develop.StaticFiles
+      Develop.StaticFiles.Build
+      Diff
+      ElmMain
+      Init
+      Install
+      Make
+      Publish
+      Repl
+      Terminal
+      Terminal.Chomp
+      Terminal.Error
+      Terminal.Helpers
+      Terminal.Internal
+      BackgroundWriter
+      Build
+      Deps.Bump
+      Deps.Diff
+      Deps.Registry
+      Deps.Solver
+      Deps.Website
+      Elm.Details
+      Elm.Outline
+      File
+      Generate
+      Http
+      Reporting
+      Reporting.Exit
+      Reporting.Exit.Help
+      Reporting.Task
+      Stuff
   other-modules:
       Paths_fuddle
   hs-source-dirs:
       src
+      elm-wasm/compiler/src
+      elm-wasm/terminal/src
+      elm-wasm/terminal/impl
+      elm-wasm/builder/src
+      elm-wasm/reactor/src
   default-extensions:
       OverloadedStrings
       DuplicateRecordFields
       OverloadedRecordDot
+      TemplateHaskell
   ghc-options: -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      aeson
+      HTTP
+    , SHA
+    , aeson
+    , ansi-terminal >=0.8
+    , ansi-wl-pprint
     , base >=4.7 && <5
+    , binary
     , bytestring
+    , containers
     , directory
+    , edit-distance
+    , file-embed
+    , filelock
     , filepath
+    , fsnotify
+    , ghc-prim
     , gitrev
+    , haskeline
+    , http-client
+    , http-client-tls
+    , http-types
+    , language-glsl
     , mtl
+    , network
     , optparse-applicative
+    , parsec
+    , process
+    , raw-strings-qq
+    , scientific
+    , snap-core
+    , snap-server
+    , template-haskell
     , text
     , time
+    , unordered-containers
+    , utf8-string
     , vector
+    , websockets
+    , word8
     , yaml
+    , zip-archive
   default-language: Haskell2010
 
 executable fuddle
@@ -69,21 +245,51 @@ executable fuddle
       OverloadedStrings
       DuplicateRecordFields
       OverloadedRecordDot
+      TemplateHaskell
   ghc-options: -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      aeson
+      HTTP
+    , SHA
+    , aeson
+    , ansi-terminal >=0.8
+    , ansi-wl-pprint
     , base >=4.7 && <5
+    , binary
     , bytestring
+    , containers
     , directory
+    , edit-distance
+    , file-embed
+    , filelock
     , filepath
+    , fsnotify
     , fuddle
+    , ghc-prim
     , gitrev
+    , haskeline
+    , http-client
+    , http-client-tls
+    , http-types
+    , language-glsl
     , mtl
+    , network
     , optparse-applicative
+    , parsec
+    , process
+    , raw-strings-qq
+    , scientific
+    , snap-core
+    , snap-server
+    , template-haskell
     , text
     , time
+    , unordered-containers
+    , utf8-string
     , vector
+    , websockets
+    , word8
     , yaml
+    , zip-archive
   default-language: Haskell2010
 
 test-suite fuddle-test
@@ -97,19 +303,49 @@ test-suite fuddle-test
       OverloadedStrings
       DuplicateRecordFields
       OverloadedRecordDot
+      TemplateHaskell
   ghc-options: -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      aeson
+      HTTP
+    , SHA
+    , aeson
+    , ansi-terminal >=0.8
+    , ansi-wl-pprint
     , base >=4.7 && <5
+    , binary
     , bytestring
+    , containers
     , directory
+    , edit-distance
+    , file-embed
+    , filelock
     , filepath
+    , fsnotify
     , fuddle
+    , ghc-prim
     , gitrev
+    , haskeline
+    , http-client
+    , http-client-tls
+    , http-types
+    , language-glsl
     , mtl
+    , network
     , optparse-applicative
+    , parsec
+    , process
+    , raw-strings-qq
+    , scientific
+    , snap-core
+    , snap-server
+    , template-haskell
     , text
     , time
+    , unordered-containers
+    , utf8-string
     , vector
+    , websockets
+    , word8
     , yaml
+    , zip-archive
   default-language: Haskell2010

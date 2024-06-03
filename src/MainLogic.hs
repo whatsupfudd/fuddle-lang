@@ -1,7 +1,7 @@
 module MainLogic
 where
 
-import Data.Text (pack)
+import Data.Text (pack, unpack, splitOn)
 import qualified System.Environment as Env
 
 import qualified Options as Opt
@@ -29,7 +29,7 @@ runWithOptions cliOptions fileOptions = do
           case aJob of
             Opt.HelpCmd -> Cmd.helpCmd
             Opt.VersionCmd -> Cmd.versionCmd
-            -- HERE: add the other commands for this project.
+            Opt.CompileCmd restOfCmd -> Cmd.compileCmd $ map unpack $ splitOn " " restOfCmd
       result <- cmdExecutor rtOptions
       -- TODO: return a properly kind of conclusion.
       pure ()
