@@ -9,6 +9,7 @@ module Generate.JavaScript.Name
   , fromGlobal
   , fromCycle
   , fromKernel
+  , jsEval
   , makeF
   , makeA
   , makeLabel
@@ -19,7 +20,7 @@ module Generate.JavaScript.Name
 
 
 import qualified Data.ByteString.Builder as B
-import Data.Monoid ((<>))
+-- import Data.Monoid ((<>))
 import qualified Data.Map as Map
 import qualified Data.Name as Name
 import qualified Data.Set as Set
@@ -86,7 +87,9 @@ homeToBuilder (ModuleName.Canonical (Pkg.Name author project) home) =
   <> usd <>
   Utf8.toEscapedBuilder 0x2E {- . -} 0x24 {- $ -} home
 
-
+jsEval :: Name
+jsEval =
+  Name (B.byteString "eval")
 
 -- TEMPORARY NAMES
 

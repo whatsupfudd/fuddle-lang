@@ -59,6 +59,7 @@ import Data.Name (Name)
 
 import qualified AST.Source as Src
 import qualified AST.Utils.Binop as Binop
+import qualified AST.Utils.Javascript as Javascript
 import qualified AST.Utils.Shader as Shader
 import qualified Data.Index as Index
 import qualified Elm.Float as EF
@@ -105,7 +106,7 @@ data Expr_
   | Unit
   | Tuple Expr Expr (Maybe Expr)
   | Shader Shader.Source Shader.Types
-
+  | Javascript Javascript.Source
 
 data CaseBranch =
   CaseBranch Pattern Expr

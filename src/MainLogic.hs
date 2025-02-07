@@ -29,7 +29,7 @@ runWithOptions cliOptions fileOptions = do
           case aJob of
             Opt.HelpCmd -> Cmd.helpCmd
             Opt.VersionCmd -> Cmd.versionCmd
-            Opt.CompileCmd restOfCmd -> Cmd.compileCmd $ map unpack $ splitOn " " restOfCmd
+            Opt.CompileCmd restOfCmd -> Cmd.compileCmd $ map unpack restOfCmd
       result <- cmdExecutor rtOptions
       -- TODO: return a properly kind of conclusion.
       pure ()

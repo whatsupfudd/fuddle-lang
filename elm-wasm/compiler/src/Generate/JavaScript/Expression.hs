@@ -22,6 +22,7 @@ import qualified Data.Utf8 as Utf8
 
 import qualified AST.Canonical as Can
 import qualified AST.Optimized as Opt
+import qualified AST.Utils.Javascript as Javascript
 import qualified AST.Utils.Shader as Shader
 import qualified Data.Index as Index
 import qualified Elm.Compiler.Type as Type
@@ -71,6 +72,7 @@ exprComment expr =
     Opt.Unit -> "Unit"
     Opt.Tuple _ _ _ -> "Tuple"
     Opt.Shader _ _ _ -> "Shader"
+    Opt.Javascript _ -> "Inline-JS"
 
 
 generateJsExpr :: Mode.Mode -> Opt.Expr -> JS.Expr
@@ -238,6 +240,9 @@ generateUncommented mode expression =
         , ( JsName.fromLocal "attributes", toTranslationObject attributes )
         , ( JsName.fromLocal "uniforms", toTranslationObject uniforms )
         ]
+
+    Opt.Javascript src ->
+      JsExpr $ JS.Call (JS.Ref JsName.jsEval) [ JS.String (Javascript.toJsStringBuilder src) ]
 
 
 

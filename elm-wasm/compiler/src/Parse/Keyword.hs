@@ -9,6 +9,7 @@ module Parse.Keyword
   , module_, import_, exposing_, as_
   , effect_, where_, command_, subscription_
   , k4, k5
+  , template_
   )
   where
 
@@ -104,6 +105,8 @@ exposing_ tx = k8 0x65 0x78 0x70 0x6F 0x73 0x69 0x6E 0x67 tx
 as_ :: (Row -> Col -> x) -> Parser x ()
 as_ tx = k2 0x61 0x73 tx
 
+template_ :: (Row -> Col -> x) -> Parser x ()
+template_ tx = k8 0x74 0x65 0x6D 0x70 0x6C 0x61 0x74 0x65 tx
 
 
 -- EFFECTS

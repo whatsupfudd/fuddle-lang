@@ -1,5 +1,6 @@
-{-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE BangPatterns, MagicHash, OverloadedStrings, UnboxedTuples #-}
+{-# OPTIONS_GHC -Wall #-}
+
 module Parse.Variable
   ( lower
   , upper

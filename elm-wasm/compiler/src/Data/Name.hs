@@ -1,4 +1,3 @@
-
 {-# LANGUAGE BangPatterns, EmptyDataDecls, FlexibleInstances, MagicHash, UnboxedTuples #-}
 {-# OPTIONS_GHC -fno-warn-name-shadowing #-}
 module Data.Name(

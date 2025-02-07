@@ -25,7 +25,7 @@ data GlobalOptions = GlobalOptions {
 data Command =
   HelpCmd
   | VersionCmd
-  | CompileCmd Text
+  | CompileCmd [Text]
   deriving stock (Show)
 
 {- HERE: Additional structures for holding new command parameters:
@@ -107,4 +107,4 @@ commandDefs =
 
 compileOpts :: Parser Command
 compileOpts =
-  CompileCmd <$> strArgument (metavar "TMP_ELM" <> help "command for compiler.")
+  CompileCmd <$> some (strArgument (metavar "TMP_ELM" <> help "command for compiler."))

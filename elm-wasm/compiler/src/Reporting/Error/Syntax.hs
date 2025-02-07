@@ -228,6 +228,8 @@ data Expr
   | EndlessShader Row Col
   | ShaderProblem [Char.Char] Row Col
   | IndentOperatorRight Name.Name Row Col
+  | EndlessJavascript Row Col
+  | JavascriptProblem [Char.Char] Row Col
 
 
 data Record
@@ -2634,6 +2636,36 @@ toExprReport source context expr startRow startCol =
             D.stack
               [ D.reflow $
                   "I use a 3rd party GLSL parser for now, and I did my best to extract their error message:"
+              , D.indent 4 $ D.vcat $
+                  map D.fromChars (filter (/="") (lines problem))
+              ]
+          )
+
+    EndlessJavascript row col ->
+      let
+        region = toRegion row col
+      in
+      Report.Report "ENDLESS JAVASCRIPT" region [] $
+        Code.toSnippet source region Nothing
+          ( 
+            D.reflow "I cannot find the end of this shader:"
+          ,
+            D.reflow "Add a |] somewhere after this to end the shader."
+          )
+
+    JavascriptProblem problem row col ->
+      let
+        region = toRegion row col
+      in
+      Report.Report "JAVASCRIPT PROBLEM" region [] $
+        Code.toSnippet source region Nothing
+          (
+            D.reflow $
+              "I ran into a problem while parsing this JavaScript block."
+          ,
+            D.stack
+              [ D.reflow $
+                  "I use a 3rd party JavaScript parser for now, and I did my best to extract their error message:"
               , D.indent 4 $ D.vcat $
                   map D.fromChars (filter (/="") (lines problem))
               ]

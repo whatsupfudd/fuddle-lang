@@ -173,6 +173,9 @@ optimize cycle (A.At region expression) =
     Can.Shader src (Shader.Types attributes uniforms _varyings) ->
       pure (Opt.Shader src (Map.keysSet attributes) (Map.keysSet uniforms))
 
+    -- TODO: add javascript support:
+    Can.Javascript src ->
+      pure (Opt.Javascript src)
 
 
 -- UPDATE

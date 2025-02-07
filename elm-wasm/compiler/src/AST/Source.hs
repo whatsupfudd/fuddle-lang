@@ -29,6 +29,7 @@ import qualified Data.Name as Name
 
 import qualified AST.Utils.Binop as Binop
 import qualified AST.Utils.Shader as Shader
+import qualified AST.Utils.Javascript as Javascript
 import qualified Elm.Float as EF
 import qualified Elm.String as ES
 import qualified Parse.Primitives as P
@@ -65,7 +66,7 @@ data Expr_
   | Unit
   | Tuple Expr Expr [Expr]
   | Shader Shader.Source Shader.Types
-
+  | Javascript Javascript.Source
 
 data VarType = LowVar | CapVar
 

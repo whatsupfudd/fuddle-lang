@@ -151,6 +151,11 @@ constrain rtv (A.At region expression) expected =
     Can.Shader _src types ->
       constrainShader region types expected
 
+    -- TODO: add constraint for javascript:
+    Can.Javascript src ->
+      -- Just to get a compilation going:
+      return $ CEqual region Unit UnitN expected
+
 
 
 -- CONSTRAIN LAMBDA

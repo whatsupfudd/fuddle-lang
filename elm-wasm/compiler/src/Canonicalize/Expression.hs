@@ -160,6 +160,8 @@ canonicalize env (A.At region expression) =
     Src.Shader src tipe ->
         Result.ok (Can.Shader src tipe)
 
+    Src.Javascript src ->
+      Result.ok (Can.Javascript src)
 
 
 -- CANONICALIZE TUPLE EXTRAS

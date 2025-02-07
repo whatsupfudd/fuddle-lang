@@ -30,6 +30,7 @@ import qualified Data.Set as Set
 
 import qualified AST.Canonical as Can
 import qualified AST.Utils.Shader as Shader
+import qualified AST.Utils.Javascript as Javascript
 import qualified Data.Index as Index
 import qualified Elm.Float as EF
 import qualified Elm.Kernel as K
@@ -72,6 +73,7 @@ data Expr
   | Unit
   | Tuple Expr Expr (Maybe Expr)
   | Shader Shader.Source (Set.Set Name) (Set.Set Name)
+  | Javascript Javascript.Source
 
 
 data Global = Global ModuleName.Canonical Name
@@ -278,7 +280,7 @@ instance Binary Expr where
       Unit             -> putWord8 24
       Tuple a b c      -> putWord8 25 >> put a >> put b >> put c
       Shader a b c     -> putWord8 26 >> put a >> put b >> put c
-
+      Javascript a     -> putWord8 27 >> put a
   get =
     do  word <- getWord8
         case word of
@@ -309,6 +311,7 @@ instance Binary Expr where
           24 -> pure   Unit
           25 -> liftM3 Tuple get get get
           26 -> liftM3 Shader get get get
+          27 -> liftM  Javascript get
           _  -> fail "problem getting Opt.Expr binary"
 
 
